@@ -29,17 +29,20 @@
 1. **查看workflow**
    - 进入仓库的 Actions 标签页
    - 应该能看到 "新闻采集工具" workflow
+   - 如果看不到，检查文件路径：`.github/workflows/news-scraper.yml`
 
-2. **手动触发**
-   - 点击 "新闻采集工具" workflow
-   - 点击右侧 "Run workflow" 按钮
-   - 输入搜索关键字和平台
-   - 点击 "Run workflow" 执行
+2. **手动触发（唯一方式）**
+   - 点击左侧的 "新闻采集工具" workflow
+   - 点击右侧绿色的 "Run workflow" 下拉按钮
+   - 选择分支（通常是 main 或 master）
+   - 输入搜索关键字（必填）
+   - 选择平台（可选，默认所有平台）
+   - 点击 "Run workflow" 按钮执行
 
-3. **自动触发（已添加）**
-   - 当推送代码到 main/master 分支时
-   - 如果修改了 workflow 文件或 scraper.py
-   - 会自动运行（使用默认参数）
+3. **重要说明**
+   - ⚠️ 当前配置为**仅手动触发**，不会自动运行
+   - ✅ 这样可以避免push时循环构建
+   - ✅ 提交JSON文件不会触发新的workflow
 
 ## 故障排查：
 
