@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻采集API - 数据接口</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .method {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📰 新闻采集API接口</h1>
+        <p>通过以下方式获取新闻采集结果：</p>
+        
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <strong>获取最新结果</strong><br>
+            <code>results_latest.json</code><br>
+            <a href="results_latest.json" target="_blank">查看最新结果</a>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method">GET</span>
+            <strong>获取特定运行结果</strong><br>
+            <code>results_{run_id}_{run_number}_{timestamp}.json</code><br>
+            <p>通过GitHub Actions Artifacts下载特定运行的结果文件</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method">API</span>
+            <strong>GitHub API获取Artifacts</strong><br>
+            <code>GET https://api.github.com/repos/{owner}/{repo}/actions/artifacts</code><br>
+            <p>使用GitHub API获取所有可用的Artifacts列表</p>
+        </div>
+        
+        <h2>使用示例</h2>
+        <pre><code># 获取最新结果
+curl https://{username}.github.io/{repo}/api/results_latest.json
+
+# 或使用fetch
+fetch('https://{username}.github.io/{repo}/api/results_latest.json')
+  .then(res => res.json())
+  .then(data => console.log(data));</code></pre>
+        
+        <h2>数据格式</h2>
+        <pre><code>{
+  "keyword": "搜索关键字",
+  "total": 30,
+  "platforms": ["toutiao", "google", "bing"],
+  "results": [
+    {
+      "title": "新闻标题",
+      "url": "https://example.com/news",
+      "platform": "toutiao"
+    }
+  ],
+  "timestamp": "2024-01-01T12:00:00",
+  "run_id": "123456789",
+  "filename": "results_123456789_1_20240101_120000.json"
+}</code></pre>
+    </div>
+</body>
+</html>
