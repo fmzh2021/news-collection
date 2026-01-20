@@ -62,11 +62,50 @@ news-json-api/
 └── README.md                    # 项目说明
 ```
 
+## 问题解决
+
+### 1. 头条数据获取问题
+头条网站有较强的反爬虫机制，已优化解析逻辑：
+- 改进了JSON数据提取方法
+- 增加了多种HTML选择器策略
+- 添加了API接口尝试（可能受签名限制）
+- 如果仍然无法获取，建议使用Playwright等浏览器自动化工具
+
+### 2. 并发覆盖问题
+已解决并发执行时的文件覆盖问题：
+- 使用唯一文件名：`results_{run_id}_{run_number}_{timestamp}.json`
+- 每个运行都有独立的Artifact
+- 同时保留 `results_latest.json` 作为最新结果
+
+### 3. 外部获取数据
+提供三种方式获取结果：
+
+**方式1: GitHub Pages API**
+```bash
+# 获取最新结果
+curl https://{username}.github.io/{repo}/api/results_latest.json
+```
+
+**方式2: GitHub Artifacts**
+- 在GitHub Actions运行完成后，在Artifacts中下载 `news-results-{run_id}`
+
+**方式3: GitHub API**
+```bash
+# 获取所有Artifacts列表
+curl -H "Authorization: token YOUR_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/actions/artifacts
+
+# 下载特定Artifact
+curl -L -H "Authorization: token YOUR_TOKEN" \
+  https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip
+```
+
 ## 注意事项
 
 - 搜索结果依赖于各平台的 HTML 结构，如果平台更新页面结构可能需要调整解析逻辑
 - 某些平台可能有反爬虫机制，建议合理使用频率
 - 结果数量可能因平台和关键字而异
+- 头条数据可能需要浏览器渲染，如持续无法获取建议使用Playwright
 
 ## 许可证
 

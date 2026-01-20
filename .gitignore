@@ -25,6 +25,8 @@ wheels/
 
 # 结果文件
 results.json
+results_local_*.json
+results_latest.json
 *.json.bak
 
 # IDE

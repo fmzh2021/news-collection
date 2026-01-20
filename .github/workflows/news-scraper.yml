@@ -30,6 +30,11 @@ jobs:
       run: |
         pip install -r requirements.txt
     
+    - name: 安装Playwright浏览器
+      run: |
+        playwright install chromium
+        playwright install-deps chromium
+    
     - name: 运行新闻采集
       env:
         KEYWORD: ${{ inputs.keyword }}
@@ -37,8 +42,49 @@ jobs:
       run: |
         python scraper.py "$KEYWORD" "$PLATFORMS"
     
-    - name: 上传结果
+    - name: 上传结果文件
       uses: actions/upload-artifact@v3
       with:
-        name: news-results
-        path: results.json
+        name: news-results-${{ github.run_id }}
+        path: |
+          results_*.json
+          results_latest.json
+        retention-days: 30
+    
+    - name: 输出结果文件路径
+      id: result_file
+      run: |
+        RESULT_FILE=$(ls -t results_*.json | head -1)
+        echo "result_file=$RESULT_FILE" >> $GITHUB_OUTPUT
+        echo "结果文件: $RESULT_FILE"
+    
+    - name: 安装jq
+      run: sudo apt-get install -y jq
+    
+    - name: 创建结果摘要
+      run: |
+        RESULT_FILE=$(ls -t results_*.json | head -1)
+        if [ -f "$RESULT_FILE" ]; then
+          TOTAL=$(jq '.total' "$RESULT_FILE")
+          KEYWORD=$(jq -r '.keyword' "$RESULT_FILE")
+          echo "## 新闻采集结果" >> $GITHUB_STEP_SUMMARY
+          echo "- **关键字**: $KEYWORD" >> $GITHUB_STEP_SUMMARY
+          echo "- **总数**: $TOTAL 条" >> $GITHUB_STEP_SUMMARY
+          echo "- **结果文件**: \`$RESULT_FILE\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **下载**: 在 Artifacts 中下载 \`news-results-${{ github.run_id }}\`" >> $GITHUB_STEP_SUMMARY
+        fi
+    
+    - name: 准备API文件
+      run: |
+        mkdir -p api
+        cp results_*.json api/ 2>/dev/null || true
+        cp results_latest.json api/ 2>/dev/null || true
+        cp api/index.html api/ 2>/dev/null || true
+    
+    - name: 部署到GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./api
+        keep_files: true
