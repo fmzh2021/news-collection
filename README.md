@@ -82,8 +82,11 @@ news-json-api/
 
 **方式1: GitHub Pages API**
 ```bash
-# 获取最新结果
-curl https://{username}.github.io/{repo}/api/results_latest.json
+# 获取最新结果（注意：由于 publish_dir: ./api，文件在根目录）
+curl https://{username}.github.io/{repo}/results_latest.json
+
+# 示例：如果仓库是 fmzh2021/news-collection
+curl https://fmzh2021.github.io/news-collection/results_latest.json
 ```
 
 **方式2: GitHub Artifacts**
