@@ -1,7 +1,7 @@
 name: 新闻采集工具
 
 on:
-  # 仅手动触发，避免push时循环构建
+  # 手动触发
   workflow_dispatch:
     inputs:
       keyword:
@@ -13,6 +13,20 @@ on:
         required: false
         default: 'toutiao,google,bing'
         type: string
+  # push触发 - 但只监听workflow文件和代码文件的变化，不监听JSON结果文件
+  # 这样可以确保workflow正常显示，同时避免循环构建
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '.github/workflows/**'
+      - 'scraper.py'
+      - 'requirements.txt'
+      # 明确排除JSON文件，避免循环构建
+      - '!results_*.json'
+      - '!results_latest.json'
+      - '!api/**'
 
 jobs:
   scrape-news:

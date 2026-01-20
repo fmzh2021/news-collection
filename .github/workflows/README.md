@@ -46,21 +46,41 @@
 
 ## 故障排查：
 
-如果Actions仍然不显示：
+### 如果看不到 "Run workflow" 按钮：
 
-1. 检查文件是否已提交：
+1. **确认文件已提交到GitHub**
    ```bash
    git status
    git add .github/workflows/news-scraper.yml
    git commit -m "Add workflow"
-   git push
+   git push origin main  # 或 master
    ```
 
-2. 检查文件内容是否正确：
-   ```bash
-   cat .github/workflows/news-scraper.yml
-   ```
+2. **确认文件在主分支**
+   - workflow文件必须在 `main` 或 `master` 分支
+   - 如果文件在其他分支，需要合并到主分支
 
-3. 检查GitHub仓库设置中的Actions权限
+3. **检查GitHub Actions是否启用**
+   - 进入仓库 Settings → Actions → General
+   - 确保 "Allow all actions and reusable workflows" 已启用
+   - 确保 "Workflow permissions" 设置为 "Read and write permissions"
 
-4. 等待几分钟，GitHub可能需要时间同步
+4. **刷新页面**
+   - 按 `Ctrl+F5` (Windows) 或 `Cmd+Shift+R` (Mac) 强制刷新
+   - 或者等待几分钟让GitHub同步
+
+5. **检查workflow文件位置**
+   - 文件路径必须是：`.github/workflows/news-scraper.yml`
+   - 文件名必须以 `.yml` 或 `.yaml` 结尾
+
+6. **检查YAML语法**
+   - 确保缩进使用空格（不是Tab）
+   - 确保 `workflow_dispatch` 正确配置
+
+### 如何找到 "Run workflow" 按钮：
+
+1. 进入 GitHub 仓库页面
+2. 点击顶部的 **Actions** 标签
+3. 在左侧边栏点击 **news-scraper.yml** workflow
+4. 在右侧应该能看到绿色的 **"Run workflow"** 按钮
+5. 如果看不到，检查上面的故障排查步骤
