@@ -1,6 +1,7 @@
 name: 新闻采集工具
 
 on:
+  # 手动触发
   workflow_dispatch:
     inputs:
       keyword:
@@ -12,6 +13,16 @@ on:
         required: false
         default: 'toutiao,google,bing'
         type: string
+  # 推送到main/master分支时也触发（可选，用于测试workflow是否正常）
+  # 注意：push触发时使用默认值
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - '.github/workflows/**'
+      - 'scraper.py'
+      - 'requirements.txt'
 
 jobs:
   scrape-news:
@@ -37,9 +48,11 @@ jobs:
     
     - name: 运行新闻采集
       env:
-        KEYWORD: ${{ inputs.keyword }}
-        PLATFORMS: ${{ inputs.platforms }}
+        KEYWORD: ${{ github.event.inputs.keyword }}
+        PLATFORMS: ${{ github.event.inputs.platforms }}
       run: |
+        KEYWORD="${KEYWORD:-测试}"
+        PLATFORMS="${PLATFORMS:-toutiao,google,bing}"
         python scraper.py "$KEYWORD" "$PLATFORMS"
     
     - name: 上传结果文件
