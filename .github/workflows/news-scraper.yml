@@ -1,0 +1,44 @@
+name: 新闻采集工具
+
+on:
+  workflow_dispatch:
+    inputs:
+      keyword:
+        description: '搜索关键字'
+        required: true
+        type: string
+      platforms:
+        description: '搜索平台 (用逗号分隔: toutiao,google,bing)'
+        required: false
+        default: 'toutiao,google,bing'
+        type: string
+
+jobs:
+  scrape-news:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+    
+    - name: 设置 Python 环境
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: 安装依赖
+      run: |
+        pip install -r requirements.txt
+    
+    - name: 运行新闻采集
+      env:
+        KEYWORD: ${{ inputs.keyword }}
+        PLATFORMS: ${{ inputs.platforms }}
+      run: |
+        python scraper.py "$KEYWORD" "$PLATFORMS"
+    
+    - name: 上传结果
+      uses: actions/upload-artifact@v3
+      with:
+        name: news-results
+        path: results.json
