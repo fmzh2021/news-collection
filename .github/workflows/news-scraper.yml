@@ -1,7 +1,7 @@
 name: 新闻采集工具
 
 on:
-  # 手动触发
+  # 仅手动触发，避免push时循环构建
   workflow_dispatch:
     inputs:
       keyword:
@@ -13,16 +13,6 @@ on:
         required: false
         default: 'toutiao,google,bing'
         type: string
-  # 推送到main/master分支时也触发（可选，用于测试workflow是否正常）
-  # 注意：push触发时使用默认值
-  push:
-    branches:
-      - main
-      - master
-    paths:
-      - '.github/workflows/**'
-      - 'scraper.py'
-      - 'requirements.txt'
 
 jobs:
   scrape-news:
@@ -92,12 +82,30 @@ jobs:
         mkdir -p api
         cp results_*.json api/ 2>/dev/null || true
         cp results_latest.json api/ 2>/dev/null || true
-        cp api/index.html api/ 2>/dev/null || true
+        # 如果index.html不存在，创建一个简单的
+        if [ ! -f api/index.html ]; then
+          cat > api/index.html << 'EOF'
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻采集API</title>
+</head>
+<body>
+    <h1>新闻采集API接口</h1>
+    <p>获取最新结果: <a href="results_latest.json">results_latest.json</a></p>
+</body>
+</html>
+EOF
+        fi
     
     - name: 部署到GitHub Pages
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./api
         keep_files: true
+        # 使用GITHUB_TOKEN而不是PAT，避免权限问题
+        cname: false
